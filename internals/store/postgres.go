@@ -1,12 +1,20 @@
+package store
 
 import(
 	"database/sql"
 	"context"
 )
 
+var _ URLStore = (*PostgresStore)(nil)
+
 type PostgresStore struct{
 	db *sql.DB
 }
+
+func NewPostgresStore(db *sql.DB) *PostgresStore {
+    return &PostgresStore{db: db}
+}
+
 
 func (s *PostgresStore)GetByShortCode(ctx context.Context, shortcode string)(*URL, error){
 	row:= s.db.QueryRowContext(ctx, "SELECT id, original_url, short_code, created_at FROM urls WHERE short_code = $1",shortcode)
@@ -22,11 +30,10 @@ func (s *PostgresStore)GetByShortCode(ctx context.Context, shortcode string)(*UR
 	return &u, nil  // happy path
 }
 
-func(s * PostgresStore) CreateUrl(ctx context.Context, url string, shortcode string)(string , error){
-	row := s.db.QueryRowContext(ctx,
-		"INSERT INTO urls (original_url, short_code) VALUES ($1, $2) RETURNING id, original_url, short_code, created_at",
-		url,shortcode
-	)
+func(s * PostgresStore) CreateUrl(ctx context.Context, url string, shortcode string)(*URL , error){
+	row := s.db.QueryRowContext(ctx,"INSERT INTO urls (original_url, short_code) VALUES ($1, $2 RETURNING id, original_url, short_code, created_at",url,shortcode)
+
+	var u URL
 	err := row.Scan(&u.ID, &u.OriginalURL, &u.ShortCode, &u.CreatedAt)
 	if err != nil {
 		return nil, err

@@ -8,6 +8,8 @@ import(
 	"time"
 	"github.com/joho/godotenv"
 	"database/sql"
+	"github.com/Kamalpreet-singh007/url-shortener/internals/store"
+	"github.com/Kamalpreet-singh007/url-shortener/internals/handler"
     _"github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -31,6 +33,9 @@ func main(){
 		log.Fatalf("could not connect to db: %s", err)
 	}
 
+	urlStore  = store.NewPostgresStore(db)
+	UrlHandler = handler.NewUrlHandler(urlStore)
+
 	log.Println("db connected succesfully")
 
 	mux := http.NewServeMux()
@@ -40,6 +45,8 @@ func main(){
         w.Header().Set("Content-Type", "application/json")
         fmt.Fprintf(w, `{"status":"ok"}`)
     })
+	mux.HandleFunc("/api/shorten", shortenHandler)
+	mux.HandleFunc("/{code}",redirectHandler)
 
 	srv := http.Server{
 		Addr:         ":" + port,
