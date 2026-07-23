@@ -14,7 +14,7 @@ type URL struct {
 }
 
 type URLStore interface {
-	CreateUrl(ctx context.Context, originalurl string, shortcode string)(*URL , error)
+	CreateUrl(ctx context.Context, originalurl string)(*URL , error)
 	GetByShortCode(ctx context.Context, shortcode string)(*URL, error)
 
 }
