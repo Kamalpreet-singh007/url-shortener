@@ -6,19 +6,19 @@ import(
 	"github.com/redis/go-redis/v9"
 )
 
-type CacheStore struct{
+type CachedUrlStore struct{
 	dbStore URLStore
 	cache Cache	
 }
 
-func NewCacheStore(dbStore URLStore, cache Cache) *CacheStore {
-	return &CacheStore{
+func NewCachedUrlStore(dbStore URLStore, cache Cache) *CachedUrlStore {
+	return &CachedUrlStore{
 		dbStore: dbStore,
 		cache: cache,
 	}
 }
 
-func (cs *CacheStore) GetByShortCode(ctx context.Context, shortcode string)(*URL, error){
+func (cs *CachedUrlStore) GetByShortCode(ctx context.Context, shortcode string)(*URL, error){
 	shortcodeKey := "url_shortener:shortcode:" + shortcode
 	url,err := cs.cache.get(ctx, shortcodeKey)
 	if err == nil && url != "" {
@@ -42,7 +42,7 @@ func (cs *CacheStore) GetByShortCode(ctx context.Context, shortcode string)(*URL
 	return urlObj, nil
 }
 
-func (cs *CacheStore) CreateUrl(ctx context.Context, url string)(*URL , error){
+func (cs *CachedUrlStore) CreateUrl(ctx context.Context, url string)(*URL , error){
 	urlObj,err := cs.dbStore.CreateUrl(ctx, url)
 	if err != nil {
 		return nil, err
