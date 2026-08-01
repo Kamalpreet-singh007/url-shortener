@@ -3,7 +3,7 @@ package handler
 import(
 	"net/http"
 	"errors"
-	"database/sql"
+	"github.com/Kamalpreet-singh007/url-shortener/internals/store"
 )
 
 
@@ -11,7 +11,7 @@ func (h *UrlHandler) Redirect(w http.ResponseWriter, r *http.Request) {
 	shortcode :=r.PathValue("code")
 
 	url, err := h.Store.GetByShortCode(r.Context(), shortcode)
-	if errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, store.ErrNotFound) {
 		http.Error(w, "Short_code not found", http.StatusNotFound)
 		return
 	}

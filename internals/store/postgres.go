@@ -4,6 +4,8 @@ import(
 	"database/sql"
 	"context"
 	"github.com/Kamalpreet-singh007/url-shortener/pkg/base62"
+	"errors"
+	"fmt"
 )
 
 var _ URLStore = (*PostgresStore)(nil)
@@ -22,17 +24,21 @@ func (s *PostgresStore)GetByShortCode(ctx context.Context, shortcode string)(*UR
 
 	var u URL
 	err := row.Scan(&u.ID, &u.OriginalURL, &u.ShortCode, &u.CreatedAt)
+	
 	if err != nil {
-		return nil, err  // real problem
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil,  fmt.Errorf("get by short code: %w", err)
 	}
-	return &u, nil  // happy path
+	return &u, nil  
 }
 
 func(s * PostgresStore) CreateUrl(ctx context.Context, url string)(*URL , error){
 	var id int64
 	err := s.db.QueryRowContext(ctx, "SELECT nextval('urls_id_seq')").Scan(&id)
 	if err != nil {
-		return nil, err
+		return nil,  fmt.Errorf("create url: %w", err)
 	}
 	shortcode := base62.Encode(id)
 
