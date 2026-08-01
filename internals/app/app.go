@@ -28,7 +28,7 @@ func Run(cfg *config.Config)error{
 	log.Println("db connected succesfully")
 
 	rdb := redis.NewClient(&redis.Options{
-    Addr:     cfg.Redis_Url,
+    Addr:     cfg.Redis_Addr,
     Password: cfg.Redis_Password,
     DB:       cfg.Redis_DB,
 	})

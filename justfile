@@ -8,3 +8,10 @@ migrate-down:
 
 run:
     go run main.go
+
+compose-migrate:
+    sudo docker compose --profile migrate run --rm migrate
+
+
+compose-logs:
+    sudo docker compose logs -f app

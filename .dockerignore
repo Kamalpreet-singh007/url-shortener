@@ -1,0 +1,12 @@
+.git
+.env
+.env.local
+tmp/
+bin/
+dist/
+build/
+vendor/
+*.test
+coverage.*
+coverage.txt
+coverage.html
